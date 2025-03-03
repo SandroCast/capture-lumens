@@ -124,7 +124,7 @@ const Camera: React.FC<CameraProps> = ({
       }
     }
   };
-  
+   
   // Handle light detection and capture sequence
   const handleLightDetected = async () => {
     if (isProcessingLight) return;
