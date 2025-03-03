@@ -95,7 +95,7 @@ const Index = () => {
         </header>
         
         <div className="flex-1 flex flex-col lg:flex-row gap-6 items-center max-w-5xl mx-auto w-full">
-          <div className="w-full lg:w-2/3 h-[50vh] lg:h-[70vh] rounded-xl overflow-hidden shadow-xl animate-scale-in">
+          <div className="w-full lg:w-2/3 rounded-xl overflow-hidden shadow-xl animate-scale-in">
             {availableCameras.length > 0 && selectedCamera ? (
               <Camera
                 selectedCameraId={selectedCamera}
