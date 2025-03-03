@@ -38,8 +38,8 @@ const Camera: React.FC<CameraProps> = ({
           video: {
             deviceId: selectedCameraId ? { exact: selectedCameraId } : undefined,
             facingMode: selectedCameraId ? undefined : 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
           },
           audio: false
         });
