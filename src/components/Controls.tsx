@@ -2,7 +2,6 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 interface ControlsProps {
@@ -25,9 +24,7 @@ const Controls: React.FC<ControlsProps> = ({
   useFlashlight,
   setUseFlashlight,
   capturedImages,
-  isProcessing,
   isCapturing,
-  onDownloadImages,
   selectedCamera,
   availableCameras,
   onSelectCamera
@@ -84,13 +81,9 @@ const Controls: React.FC<ControlsProps> = ({
             <Badge variant="outline">{capturedImages.length}</Badge>
           </div>
           
-          <Button 
-            onClick={onDownloadImages}
-            disabled={capturedImages.length === 0 || isProcessing}
-            className="w-full glass-button"
-          >
-            {isProcessing ? 'Processing...' : `Download ${capturedImages.length} Images`}
-          </Button>
+          <div className="text-xs text-center text-green-600 font-medium">
+            Images are automatically downloaded after capture
+          </div>
         </div>
         
         <div className="text-xs text-center opacity-70 mt-4">

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import Camera from '@/components/Camera';
 import Controls from '@/components/Controls';
-import { createImagesZip, downloadBlob } from '@/utils/zipUtils';
 import { toast } from '@/components/ui/use-toast';
 
 const Index = () => {
@@ -60,30 +59,9 @@ const Index = () => {
     setCapturedImages(prev => [...prev, image]);
   };
   
-  // Handle download of all images
-  const handleDownloadImages = async () => {
-    if (capturedImages.length === 0) return;
-    
-    setIsProcessing(true);
-    
-    try {
-      const zipBlob = await createImagesZip(capturedImages);
-      downloadBlob(zipBlob, 'captured-images.zip');
-      
-      toast({
-        title: 'Download Complete',
-        description: `${capturedImages.length} images have been downloaded.`,
-      });
-    } catch (error) {
-      console.error('Download error:', error);
-      toast({
-        title: 'Download Failed',
-        description: 'Could not create zip file. Please try again.',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+  // This is just a placeholder function since we no longer use batch downloads
+  const handleDownloadImages = () => {
+    // No longer needed - kept for interface compatibility
   };
   
   return (

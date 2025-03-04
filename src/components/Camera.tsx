@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import LightDetector from './LightDetector';
 import { captureImage } from '../utils/imageProcessing';
+import { downloadBlob } from '../utils/zipUtils';
 
 interface CameraProps {
   selectedCameraId: string;
@@ -23,6 +24,7 @@ const Camera: React.FC<CameraProps> = ({
   const [isActive, setIsActive] = useState(true);
   const [isProcessingLight, setIsProcessingLight] = useState(false);
   const [flashlightOn, setFlashlightOn] = useState(false);
+  const [captureCount, setCaptureCount] = useState(0);
   
   // Start camera stream
   useEffect(() => {
@@ -146,9 +148,15 @@ const Camera: React.FC<CameraProps> = ({
         const image = await captureImage(videoRef.current);
         onImageCaptured(image);
         
+        // Download the captured image immediately
+        const captureNumber = captureCount + 1;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        downloadBlob(image, `capture-${captureNumber}-${timestamp}.jpg`);
+        setCaptureCount(captureNumber);
+        
         toast({
           title: 'Image Captured',
-          description: 'LED light detected and image saved.',
+          description: 'LED light detected, image saved and downloaded.',
         });
       }
       
