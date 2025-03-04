@@ -70,7 +70,7 @@ const Controls: React.FC<ControlsProps> = ({
             value={[sensitivity]} 
             min={0} 
             max={100} 
-            step={0.1}
+            step={0.01}
             onValueChange={(value) => setSensitivity(value[0])}
             className="mt-2"
           />
