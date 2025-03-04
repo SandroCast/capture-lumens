@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import Camera from '@/components/Camera';
 import Controls from '@/components/Controls';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 import { toast } from '@/components/ui/use-toast';
 
 const Index = () => {
@@ -66,10 +68,12 @@ const Index = () => {
   
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-gray-100">
+      <NavBar />
+      
       <div className="container px-4 py-6 mx-auto flex-1 flex flex-col">
         <header className="text-center mb-6 animate-fade-in">
-          <h1 className="text-2xl font-light tracking-tight text-gray-900">Capture Lumens</h1>
-          <p className="text-sm text-gray-500">Automatic light detection and capture</p>
+          <h1 className="text-2xl font-light tracking-tight text-gray-900">Automatic Light Detection</h1>
+          <p className="text-sm text-gray-500">Capture images when lights are detected</p>
         </header>
         
         <div className="flex-1 flex flex-col lg:flex-row gap-6 items-center max-w-5xl mx-auto w-full">
@@ -109,9 +113,7 @@ const Index = () => {
         </div>
       </div>
       
-      <footer className="text-center p-4 text-sm text-gray-400">
-        <p>Keep the app open to continue detecting lights</p>
-      </footer>
+      <Footer />
     </div>
   );
 };
