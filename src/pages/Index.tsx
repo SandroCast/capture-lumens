@@ -13,6 +13,10 @@ const Index = () => {
   const [sensitivity, setSensitivity] = useState<number>(80); // High default sensitivity
   const [useFlashlight, setUseFlashlight] = useState<boolean>(true);
   
+  // Color detection settings
+  const [targetColor, setTargetColor] = useState<string>('#FF0000'); // Default red color
+  const [colorDetectionEnabled, setColorDetectionEnabled] = useState<boolean>(false);
+  
   // Captured images
   const [capturedImages, setCapturedImages] = useState<Blob[]>([]);
   
@@ -69,7 +73,11 @@ const Index = () => {
       <div className="container px-4 py-6 mx-auto flex-1 flex flex-col">
         <header className="text-center mb-6 animate-fade-in">
           <h1 className="text-2xl font-light tracking-tight text-gray-900">Capture Lumens</h1>
-          <p className="text-sm text-gray-500">Automatic light detection and capture</p>
+          <p className="text-sm text-gray-500">
+            {colorDetectionEnabled 
+              ? `Detecting ${targetColor} colored lights` 
+              : 'Automatic light detection and capture'}
+          </p>
         </header>
         
         <div className="flex-1 flex flex-col lg:flex-row gap-6 items-center max-w-5xl mx-auto w-full">
@@ -80,6 +88,8 @@ const Index = () => {
                 sensitivity={sensitivity}
                 useFlashlight={useFlashlight}
                 onImageCaptured={handleImageCaptured}
+                targetColor={targetColor}
+                colorDetectionEnabled={colorDetectionEnabled}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
@@ -104,6 +114,10 @@ const Index = () => {
               selectedCamera={selectedCamera}
               availableCameras={availableCameras}
               onSelectCamera={setSelectedCamera}
+              targetColor={targetColor}
+              setTargetColor={setTargetColor}
+              colorDetectionEnabled={colorDetectionEnabled}
+              setColorDetectionEnabled={setColorDetectionEnabled}
             />
           </div>
         </div>

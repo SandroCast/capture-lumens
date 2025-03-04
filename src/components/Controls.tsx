@@ -3,6 +3,7 @@ import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 
 interface ControlsProps {
   sensitivity: number;
@@ -16,6 +17,10 @@ interface ControlsProps {
   selectedCamera: string;
   availableCameras: MediaDeviceInfo[];
   onSelectCamera: (deviceId: string) => void;
+  targetColor: string;
+  setTargetColor: (color: string) => void;
+  colorDetectionEnabled: boolean;
+  setColorDetectionEnabled: (enabled: boolean) => void;
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -27,7 +32,11 @@ const Controls: React.FC<ControlsProps> = ({
   isCapturing,
   selectedCamera,
   availableCameras,
-  onSelectCamera
+  onSelectCamera,
+  targetColor,
+  setTargetColor,
+  colorDetectionEnabled,
+  setColorDetectionEnabled
 }) => {
   return (
     <div className="glass-panel p-6 w-full max-w-md mx-auto animate-blur-in">
@@ -73,6 +82,35 @@ const Controls: React.FC<ControlsProps> = ({
             checked={useFlashlight} 
             onCheckedChange={setUseFlashlight}
           />
+        </div>
+        
+        {/* Color Detection Controls */}
+        <div className="space-y-3 pb-1 border-t border-gray-200 pt-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Color Detection</h3>
+            <Switch 
+              checked={colorDetectionEnabled} 
+              onCheckedChange={setColorDetectionEnabled}
+            />
+          </div>
+          
+          {colorDetectionEnabled && (
+            <div className="space-y-2">
+              <Label htmlFor="color-picker" className="text-xs">Target LED Color</Label>
+              <div className="flex items-center gap-3">
+                <input 
+                  id="color-picker"
+                  type="color" 
+                  value={targetColor} 
+                  onChange={(e) => setTargetColor(e.target.value)}
+                  className="w-10 h-10 rounded-md cursor-pointer border-0"
+                />
+                <div className="flex-1 text-xs">
+                  <span className="font-mono">{targetColor}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="pt-2">
