@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import LightDetector from './LightDetector';
-import { captureImage, hexToRgb } from '../utils/imageProcessing';
+import { captureImage } from '../utils/imageProcessing';
 import { downloadBlob } from '../utils/zipUtils';
 
 interface CameraProps {
@@ -10,17 +10,13 @@ interface CameraProps {
   sensitivity: number;
   useFlashlight: boolean;
   onImageCaptured: (image: Blob) => void;
-  targetColor: string;
-  colorDetectionEnabled: boolean;
 }
 
 const Camera: React.FC<CameraProps> = ({
   selectedCameraId,
   sensitivity,
   useFlashlight,
-  onImageCaptured,
-  targetColor,
-  colorDetectionEnabled
+  onImageCaptured
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -29,9 +25,6 @@ const Camera: React.FC<CameraProps> = ({
   const [isProcessingLight, setIsProcessingLight] = useState(false);
   const [flashlightOn, setFlashlightOn] = useState(false);
   const [captureCount, setCaptureCount] = useState(0);
-  
-  // Parse target color
-  const rgbColor = colorDetectionEnabled ? hexToRgb(targetColor) : null;
   
   // Start camera stream
   useEffect(() => {
@@ -158,13 +151,12 @@ const Camera: React.FC<CameraProps> = ({
         // Download the captured image immediately
         const captureNumber = captureCount + 1;
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const colorInfo = colorDetectionEnabled ? `-${targetColor.replace('#', '')}` : '';
-        downloadBlob(image, `capture-${captureNumber}${colorInfo}-${timestamp}.jpg`);
+        downloadBlob(image, `capture-${captureNumber}-${timestamp}.jpg`);
         setCaptureCount(captureNumber);
         
         toast({
-          title: colorDetectionEnabled ? 'Color Detected!' : 'Light Detected!',
-          description: `Image saved and downloaded.`,
+          title: 'Image Captured',
+          description: 'LED light detected, image saved and downloaded.',
         });
       }
       
@@ -174,7 +166,7 @@ const Camera: React.FC<CameraProps> = ({
       }
       
       // Cooldown period
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise(resolve => setTimeout(resolve, 10000));
       
     } catch (error) {
       console.error('Capture error:', error);
@@ -204,7 +196,6 @@ const Camera: React.FC<CameraProps> = ({
         sensitivity={sensitivity}
         isActive={isActive && !isProcessingLight}
         onLightDetected={handleLightDetected}
-        targetColor={rgbColor}
       />
       
       {/* Status indicators */}
@@ -219,13 +210,6 @@ const Camera: React.FC<CameraProps> = ({
             <p className="text-sm font-medium">Processing...</p>
           </div>
         </div>
-      )}
-      
-      {colorDetectionEnabled && (
-        <div 
-          className="absolute top-4 left-4 rounded-full w-6 h-6 border-2 border-white" 
-          style={{ backgroundColor: targetColor }}
-        />
       )}
     </div>
   );
