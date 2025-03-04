@@ -174,7 +174,7 @@ const Camera: React.FC<CameraProps> = ({
       }
       
       // Cooldown period
-      await new Promise(resolve => setTimeout(resolve, 10000));
+      await new Promise(resolve => setTimeout(resolve, 5000));
       
     } catch (error) {
       console.error('Capture error:', error);
