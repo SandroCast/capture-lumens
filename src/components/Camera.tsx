@@ -140,7 +140,7 @@ const Camera: React.FC<CameraProps> = ({
         await toggleFlashlight(true);
         
         // Allow time for exposure adjustment
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
       
       // Capture image

@@ -60,7 +60,7 @@ const Controls: React.FC<ControlsProps> = ({
           <Slider 
             value={[sensitivity]} 
             min={0} 
-            max={100} 
+            max={5} 
             step={0.1}
             onValueChange={(value) => setSensitivity(value[0])}
             className="mt-2"
