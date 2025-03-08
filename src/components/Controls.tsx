@@ -138,7 +138,7 @@ const Controls: React.FC<ControlsProps> = ({
                   id="region-x"
                   value={[detectionRegion.x]} 
                   min={0} 
-                  max={1000} 
+                  max={2000} 
                   step={10}
                   onValueChange={(value) => handleRegionChange('x', value[0])}
                 />
@@ -153,7 +153,7 @@ const Controls: React.FC<ControlsProps> = ({
                   id="region-y"
                   value={[detectionRegion.y]} 
                   min={0} 
-                  max={1000} 
+                  max={2000} 
                   step={10}
                   onValueChange={(value) => handleRegionChange('y', value[0])}
                 />
