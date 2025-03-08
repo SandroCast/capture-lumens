@@ -27,20 +27,50 @@ export const colorDistance = (
 };
 
 /**
+ * Region type definition for detection zone
+ */
+export interface DetectionRegion {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  enabled: boolean;
+}
+
+/**
  * Analyzes an image from a canvas to detect bright spots (potential LED lights)
- * of a specific color if targetColor is provided
+ * of a specific color if targetColor is provided and within a specific region if region is provided
  * Returns true if a matching light is detected based on sensitivity threshold
  */
 export const detectLight = (
   canvas: HTMLCanvasElement,
   sensitivity: number,
   targetColor?: string,
-  colorTolerance?: number
+  colorTolerance?: number,
+  region?: DetectionRegion
 ): { detected: boolean; brightestPoint: { x: number; y: number } } => {
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) return { detected: false, brightestPoint: { x: 0, y: 0 } };
 
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  // If region is enabled, we only analyze that part of the image
+  let imageData;
+  let regionOffsetX = 0;
+  let regionOffsetY = 0;
+  
+  if (region && region.enabled) {
+    // Ensure region is within canvas bounds
+    const safeX = Math.max(0, Math.min(region.x, canvas.width - 1));
+    const safeY = Math.max(0, Math.min(region.y, canvas.height - 1));
+    const safeWidth = Math.max(1, Math.min(region.width, canvas.width - safeX));
+    const safeHeight = Math.max(1, Math.min(region.height, canvas.height - safeY));
+    
+    imageData = ctx.getImageData(safeX, safeY, safeWidth, safeHeight);
+    regionOffsetX = safeX;
+    regionOffsetY = safeY;
+  } else {
+    imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  }
+  
   const data = imageData.data;
   
   let maxBrightness = 0;
@@ -56,9 +86,11 @@ export const detectLight = (
   // Sample pixels at intervals for performance
   const sampleInterval = 4; // Adjust based on performance needs
   
-  for (let y = 0; y < canvas.height; y += sampleInterval) {
-    for (let x = 0; x < canvas.width; x += sampleInterval) {
-      const i = (y * canvas.width + x) * 4;
+  const width = imageData.width;
+  
+  for (let y = 0; y < imageData.height; y += sampleInterval) {
+    for (let x = 0; x < imageData.width; x += sampleInterval) {
+      const i = (y * width + x) * 4;
       
       // Get RGB values for this pixel
       const r = data[i];
@@ -79,8 +111,8 @@ export const detectLight = (
       // Only consider this pixel if it matches our target color criteria
       if (isTargetColor && brightness > maxBrightness) {
         maxBrightness = brightness;
-        brightestX = x;
-        brightestY = y;
+        brightestX = x + regionOffsetX;
+        brightestY = y + regionOffsetY;
       }
     }
   }

@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import LightDetector from './LightDetector';
-import { captureImage } from '../utils/imageProcessing';
+import { captureImage, DetectionRegion } from '../utils/imageProcessing';
 import { downloadBlob } from '../utils/zipUtils';
 
 interface CameraProps {
@@ -12,6 +12,7 @@ interface CameraProps {
   onImageCaptured: (image: Blob) => void;
   targetColor?: string;
   colorTolerance?: number;
+  detectionRegion?: DetectionRegion;
 }
 
 const Camera: React.FC<CameraProps> = ({
@@ -20,7 +21,8 @@ const Camera: React.FC<CameraProps> = ({
   useFlashlight,
   onImageCaptured,
   targetColor,
-  colorTolerance
+  colorTolerance,
+  detectionRegion
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -204,6 +206,7 @@ const Camera: React.FC<CameraProps> = ({
         onLightDetected={handleLightDetected}
         targetColor={targetColor}
         colorTolerance={colorTolerance}
+        detectionRegion={detectionRegion}
       />
       
       {/* Status indicators */}

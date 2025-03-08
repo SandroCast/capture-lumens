@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { DetectionRegion } from '../utils/imageProcessing';
 
 interface ControlsProps {
   sensitivity: number;
@@ -21,6 +22,8 @@ interface ControlsProps {
   setTargetColor: (color: string) => void;
   colorTolerance: number;
   setColorTolerance: (value: number) => void;
+  detectionRegion: DetectionRegion;
+  setDetectionRegion: (region: DetectionRegion) => void;
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -36,8 +39,20 @@ const Controls: React.FC<ControlsProps> = ({
   targetColor,
   setTargetColor,
   colorTolerance,
-  setColorTolerance
+  setColorTolerance,
+  detectionRegion,
+  setDetectionRegion
 }) => {
+  const [showRegionSettings, setShowRegionSettings] = useState(false);
+  
+  // Handler for region changes
+  const handleRegionChange = (property: keyof DetectionRegion, value: any) => {
+    setDetectionRegion({
+      ...detectionRegion,
+      [property]: value
+    });
+  };
+  
   return (
     <div className="glass-panel p-6 w-full max-w-md mx-auto animate-blur-in">
       <div className="space-y-6">
@@ -90,6 +105,91 @@ const Controls: React.FC<ControlsProps> = ({
             />
             <div className="text-xs opacity-70">Higher values allow detecting similar colors</div>
           </div>
+        </div>
+        
+        {/* Detection Region Section */}
+        <div className="space-y-2 pt-2 border-t border-white border-opacity-10">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Detection Region</h3>
+            <Switch 
+              checked={detectionRegion.enabled} 
+              onCheckedChange={(checked) => handleRegionChange('enabled', checked)}
+            />
+          </div>
+          
+          {detectionRegion.enabled && (
+            <button
+              type="button"
+              onClick={() => setShowRegionSettings(!showRegionSettings)}
+              className="w-full text-xs text-blue-500 hover:text-blue-600 transition-colors text-left mt-1"
+            >
+              {showRegionSettings ? 'Hide Region Settings' : 'Configure Region Settings'}
+            </button>
+          )}
+          
+          {detectionRegion.enabled && showRegionSettings && (
+            <div className="space-y-3 mt-2 p-3 bg-white bg-opacity-10 rounded-lg">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="region-x" className="text-xs">X Position (%)</Label>
+                  <span className="text-xs">{Math.round(detectionRegion.x / 10)}%</span>
+                </div>
+                <Slider 
+                  id="region-x"
+                  value={[detectionRegion.x]} 
+                  min={0} 
+                  max={1000} 
+                  step={10}
+                  onValueChange={(value) => handleRegionChange('x', value[0])}
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="region-y" className="text-xs">Y Position (%)</Label>
+                  <span className="text-xs">{Math.round(detectionRegion.y / 10)}%</span>
+                </div>
+                <Slider 
+                  id="region-y"
+                  value={[detectionRegion.y]} 
+                  min={0} 
+                  max={1000} 
+                  step={10}
+                  onValueChange={(value) => handleRegionChange('y', value[0])}
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="region-width" className="text-xs">Width (%)</Label>
+                  <span className="text-xs">{Math.round(detectionRegion.width / 10)}%</span>
+                </div>
+                <Slider 
+                  id="region-width"
+                  value={[detectionRegion.width]} 
+                  min={100} 
+                  max={1000} 
+                  step={10}
+                  onValueChange={(value) => handleRegionChange('width', value[0])}
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="region-height" className="text-xs">Height (%)</Label>
+                  <span className="text-xs">{Math.round(detectionRegion.height / 10)}%</span>
+                </div>
+                <Slider 
+                  id="region-height"
+                  value={[detectionRegion.height]} 
+                  min={100} 
+                  max={1000} 
+                  step={10}
+                  onValueChange={(value) => handleRegionChange('height', value[0])}
+                />
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="space-y-2">

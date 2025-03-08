@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { detectLight } from '../utils/imageProcessing';
+import { detectLight, DetectionRegion } from '../utils/imageProcessing';
 
 interface LightDetectorProps {
   videoRef: React.RefObject<HTMLVideoElement>;
@@ -9,6 +9,7 @@ interface LightDetectorProps {
   onLightDetected: () => void;
   targetColor?: string;
   colorTolerance?: number;
+  detectionRegion?: DetectionRegion;
 }
 
 const LightDetector: React.FC<LightDetectorProps> = ({
@@ -17,7 +18,8 @@ const LightDetector: React.FC<LightDetectorProps> = ({
   isActive,
   onLightDetected,
   targetColor,
-  colorTolerance
+  colorTolerance,
+  detectionRegion
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
@@ -47,7 +49,13 @@ const LightDetector: React.FC<LightDetectorProps> = ({
             ctx.drawImage(video, 0, 0);
             
             // Detect light in the image
-            const result = detectLight(canvas, sensitivity, targetColor, colorTolerance);
+            const result = detectLight(
+              canvas, 
+              sensitivity, 
+              targetColor, 
+              colorTolerance,
+              detectionRegion
+            );
             
             if (result.detected) {
               setBrightestPoint(result.brightestPoint);
@@ -56,8 +64,7 @@ const LightDetector: React.FC<LightDetectorProps> = ({
               setBrightestPoint(null);
             }
             
-            // Update the visual dots (simplified for this example)
-            // In a real implementation, you might want to analyze multiple bright spots
+            // Update the visual dots
             if (result.brightestPoint) {
               setDots(prev => {
                 const newDots = [...prev, result.brightestPoint];
@@ -79,7 +86,7 @@ const LightDetector: React.FC<LightDetectorProps> = ({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isActive, videoRef, sensitivity, onLightDetected, targetColor, colorTolerance]);
+  }, [isActive, videoRef, sensitivity, onLightDetected, targetColor, colorTolerance, detectionRegion]);
   
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -116,6 +123,21 @@ const LightDetector: React.FC<LightDetectorProps> = ({
             height: '20px',
             backgroundColor: targetColor || '#1fb6ff',
             transform: 'translate(-50%, -50%)'
+          }}
+        />
+      )}
+      
+      {/* Display detection region if enabled */}
+      {detectionRegion && detectionRegion.enabled && (
+        <div
+          className="absolute border-2 border-dashed pointer-events-none"
+          style={{
+            left: `${(detectionRegion.x / (canvasRef.current?.width || 1)) * 100}%`,
+            top: `${(detectionRegion.y / (canvasRef.current?.height || 1)) * 100}%`,
+            width: `${(detectionRegion.width / (canvasRef.current?.width || 1)) * 100}%`,
+            height: `${(detectionRegion.height / (canvasRef.current?.height || 1)) * 100}%`,
+            borderColor: targetColor || '#1fb6ff',
+            opacity: 0.7
           }}
         />
       )}

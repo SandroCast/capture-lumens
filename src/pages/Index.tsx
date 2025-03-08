@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Camera from '@/components/Camera';
 import Controls from '@/components/Controls';
 import { toast } from '@/components/ui/use-toast';
+import { DetectionRegion } from '../utils/imageProcessing';
 
 const Index = () => {
   // Camera states
@@ -16,6 +17,15 @@ const Index = () => {
   // Color detection settings
   const [targetColor, setTargetColor] = useState<string>('#ff0000'); // Default red
   const [colorTolerance, setColorTolerance] = useState<number>(30); // Default moderate tolerance
+  
+  // Region detection settings
+  const [detectionRegion, setDetectionRegion] = useState<DetectionRegion>({
+    x: 400, // 40% from left
+    y: 400, // 40% from top
+    width: 200, // 20% width
+    height: 200, // 20% height
+    enabled: false // Disabled by default
+  });
   
   // Captured images
   const [capturedImages, setCapturedImages] = useState<Blob[]>([]);
@@ -86,6 +96,7 @@ const Index = () => {
                 onImageCaptured={handleImageCaptured}
                 targetColor={targetColor}
                 colorTolerance={colorTolerance}
+                detectionRegion={detectionRegion}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
@@ -114,6 +125,8 @@ const Index = () => {
               setTargetColor={setTargetColor}
               colorTolerance={colorTolerance}
               setColorTolerance={setColorTolerance}
+              detectionRegion={detectionRegion}
+              setDetectionRegion={setDetectionRegion}
             />
           </div>
         </div>
