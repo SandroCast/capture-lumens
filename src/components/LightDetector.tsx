@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { detectLight } from '../utils/imageProcessing';
 
@@ -6,13 +7,17 @@ interface LightDetectorProps {
   sensitivity: number;
   isActive: boolean;
   onLightDetected: () => void;
+  targetColor?: string;
+  colorTolerance?: number;
 }
 
 const LightDetector: React.FC<LightDetectorProps> = ({
   videoRef,
   sensitivity,
   isActive,
-  onLightDetected
+  onLightDetected,
+  targetColor,
+  colorTolerance
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
@@ -42,7 +47,7 @@ const LightDetector: React.FC<LightDetectorProps> = ({
             ctx.drawImage(video, 0, 0);
             
             // Detect light in the image
-            const result = detectLight(canvas, sensitivity);
+            const result = detectLight(canvas, sensitivity, targetColor, colorTolerance);
             
             if (result.detected) {
               setBrightestPoint(result.brightestPoint);
@@ -74,7 +79,7 @@ const LightDetector: React.FC<LightDetectorProps> = ({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isActive, videoRef, sensitivity, onLightDetected]);
+  }, [isActive, videoRef, sensitivity, onLightDetected, targetColor, colorTolerance]);
   
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -94,7 +99,8 @@ const LightDetector: React.FC<LightDetectorProps> = ({
             top: `${(dot.y / (canvasRef.current?.height || 1)) * 100}%`,
             width: `${8 + (index * 2)}px`,
             height: `${8 + (index * 2)}px`,
-            opacity: (index / 10) + 0.3
+            opacity: (index / 10) + 0.3,
+            backgroundColor: targetColor || '#ffffff'
           }}
         />
       ))}
@@ -102,12 +108,13 @@ const LightDetector: React.FC<LightDetectorProps> = ({
       {/* Highlight for brightest point */}
       {brightestPoint && (
         <div
-          className="absolute rounded-full bg-blue-500 shadow-lg animate-pulse-light z-10"
+          className="absolute rounded-full shadow-lg animate-pulse-light z-10"
           style={{
             left: `${(brightestPoint.x / (canvasRef.current?.width || 1)) * 100}%`,
             top: `${(brightestPoint.y / (canvasRef.current?.height || 1)) * 100}%`,
             width: '20px',
             height: '20px',
+            backgroundColor: targetColor || '#1fb6ff',
             transform: 'translate(-50%, -50%)'
           }}
         />

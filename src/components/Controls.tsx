@@ -3,6 +3,7 @@ import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 
 interface ControlsProps {
   sensitivity: number;
@@ -16,6 +17,10 @@ interface ControlsProps {
   selectedCamera: string;
   availableCameras: MediaDeviceInfo[];
   onSelectCamera: (deviceId: string) => void;
+  targetColor: string;
+  setTargetColor: (color: string) => void;
+  colorTolerance: number;
+  setColorTolerance: (value: number) => void;
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -27,7 +32,11 @@ const Controls: React.FC<ControlsProps> = ({
   isCapturing,
   selectedCamera,
   availableCameras,
-  onSelectCamera
+  onSelectCamera,
+  targetColor,
+  setTargetColor,
+  colorTolerance,
+  setColorTolerance
 }) => {
   return (
     <div className="glass-panel p-6 w-full max-w-md mx-auto animate-blur-in">
@@ -49,6 +58,38 @@ const Controls: React.FC<ControlsProps> = ({
               </option>
             ))}
           </select>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="target-color" className="text-sm font-medium block mb-2">Target LED Color</Label>
+            <div className="flex items-center gap-3">
+              <input
+                id="target-color"
+                type="color"
+                value={targetColor}
+                onChange={(e) => setTargetColor(e.target.value)}
+                className="w-10 h-10 rounded cursor-pointer border-0"
+              />
+              <div className="text-xs">{targetColor}</div>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium">Color Tolerance</h3>
+              <span className="text-xs">{colorTolerance}</span>
+            </div>
+            <Slider 
+              value={[colorTolerance]} 
+              min={0} 
+              max={100} 
+              step={1}
+              onValueChange={(value) => setColorTolerance(value[0])}
+              className="mt-2"
+            />
+            <div className="text-xs opacity-70">Higher values allow detecting similar colors</div>
+          </div>
         </div>
         
         <div className="space-y-2">

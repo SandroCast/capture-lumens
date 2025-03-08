@@ -13,6 +13,10 @@ const Index = () => {
   const [sensitivity, setSensitivity] = useState<number>(80); // High default sensitivity
   const [useFlashlight, setUseFlashlight] = useState<boolean>(true);
   
+  // Color detection settings
+  const [targetColor, setTargetColor] = useState<string>('#ff0000'); // Default red
+  const [colorTolerance, setColorTolerance] = useState<number>(30); // Default moderate tolerance
+  
   // Captured images
   const [capturedImages, setCapturedImages] = useState<Blob[]>([]);
   
@@ -80,6 +84,8 @@ const Index = () => {
                 sensitivity={sensitivity}
                 useFlashlight={useFlashlight}
                 onImageCaptured={handleImageCaptured}
+                targetColor={targetColor}
+                colorTolerance={colorTolerance}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
@@ -104,6 +110,10 @@ const Index = () => {
               selectedCamera={selectedCamera}
               availableCameras={availableCameras}
               onSelectCamera={setSelectedCamera}
+              targetColor={targetColor}
+              setTargetColor={setTargetColor}
+              colorTolerance={colorTolerance}
+              setColorTolerance={setColorTolerance}
             />
           </div>
         </div>

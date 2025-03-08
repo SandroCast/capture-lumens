@@ -10,13 +10,17 @@ interface CameraProps {
   sensitivity: number;
   useFlashlight: boolean;
   onImageCaptured: (image: Blob) => void;
+  targetColor?: string;
+  colorTolerance?: number;
 }
 
 const Camera: React.FC<CameraProps> = ({
   selectedCameraId,
   sensitivity,
   useFlashlight,
-  onImageCaptured
+  onImageCaptured,
+  targetColor,
+  colorTolerance
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -156,7 +160,9 @@ const Camera: React.FC<CameraProps> = ({
         
         toast({
           title: 'Image Captured',
-          description: 'LED light detected, image saved and downloaded.',
+          description: targetColor 
+            ? `LED light (${targetColor}) detected, image saved and downloaded.` 
+            : 'LED light detected, image saved and downloaded.',
         });
       }
       
@@ -196,6 +202,8 @@ const Camera: React.FC<CameraProps> = ({
         sensitivity={sensitivity}
         isActive={isActive && !isProcessingLight}
         onLightDetected={handleLightDetected}
+        targetColor={targetColor}
+        colorTolerance={colorTolerance}
       />
       
       {/* Status indicators */}
