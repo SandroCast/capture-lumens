@@ -13,6 +13,7 @@ interface CameraProps {
   targetColor?: string;
   colorTolerance?: number;
   detectionRegion?: DetectionRegion;
+  detectorEnabled: boolean;
 }
 
 const Camera: React.FC<CameraProps> = ({
@@ -22,7 +23,8 @@ const Camera: React.FC<CameraProps> = ({
   onImageCaptured,
   targetColor,
   colorTolerance,
-  detectionRegion
+  detectionRegion,
+  detectorEnabled
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -199,15 +201,28 @@ const Camera: React.FC<CameraProps> = ({
         className="w-full h-full object-cover"
       />
       
-      <LightDetector
-        videoRef={videoRef}
-        sensitivity={sensitivity}
-        isActive={isActive && !isProcessingLight}
-        onLightDetected={handleLightDetected}
-        targetColor={targetColor}
-        colorTolerance={colorTolerance}
-        detectionRegion={detectionRegion}
-      />
+      {detectorEnabled && (
+        <LightDetector
+          videoRef={videoRef}
+          sensitivity={sensitivity}
+          isActive={isActive && !isProcessingLight}
+          onLightDetected={handleLightDetected}
+          targetColor={targetColor}
+          colorTolerance={colorTolerance}
+          detectionRegion={detectionRegion}
+        />
+      )}
+      
+      {!detectorEnabled && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 z-10">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg text-center shadow-lg">
+            <p className="text-gray-900 dark:text-white font-medium mb-1">Detector Disabled</p>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
+              Enable the detector to start capturing images
+            </p>
+          </div>
+        </div>
+      )}
       
       {/* Status indicators */}
       {flashlightOn && (

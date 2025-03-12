@@ -31,6 +31,9 @@ const Detector: React.FC = () => {
     enabled: false // Disabled by default
   });
   
+  // LED detector enabled state
+  const [detectorEnabled, setDetectorEnabled] = useState<boolean>(false);
+  
   // Captured images
   const [capturedImages, setCapturedImages] = useState<Blob[]>([]);
   
@@ -108,6 +111,7 @@ const Detector: React.FC = () => {
                 targetColor={targetColor}
                 colorTolerance={colorTolerance}
                 detectionRegion={detectionRegion}
+                detectorEnabled={detectorEnabled}
               />
             ) : (
               <div className="w-full h-80 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl">
@@ -138,6 +142,8 @@ const Detector: React.FC = () => {
               setColorTolerance={setColorTolerance}
               detectionRegion={detectionRegion}
               setDetectionRegion={setDetectionRegion}
+              detectorEnabled={detectorEnabled}
+              setDetectorEnabled={setDetectorEnabled}
             />
           </div>
         </div>

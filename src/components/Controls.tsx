@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
@@ -24,6 +23,8 @@ interface ControlsProps {
   setColorTolerance: (value: number) => void;
   detectionRegion: DetectionRegion;
   setDetectionRegion: (region: DetectionRegion) => void;
+  detectorEnabled: boolean;
+  setDetectorEnabled: (enabled: boolean) => void;
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -41,7 +42,9 @@ const Controls: React.FC<ControlsProps> = ({
   colorTolerance,
   setColorTolerance,
   detectionRegion,
-  setDetectionRegion
+  setDetectionRegion,
+  detectorEnabled,
+  setDetectorEnabled
 }) => {
   const [showRegionSettings, setShowRegionSettings] = useState(false);
   
@@ -73,6 +76,20 @@ const Controls: React.FC<ControlsProps> = ({
               </option>
             ))}
           </select>
+        </div>
+        
+        {/* LED Detector Enable/Disable Switch */}
+        <div className="flex items-center justify-between pt-2 border-t border-white border-opacity-10">
+          <h3 className="text-sm font-medium">LED Detector</h3>
+          <Switch 
+            checked={detectorEnabled} 
+            onCheckedChange={setDetectorEnabled}
+          />
+        </div>
+        <div className="text-xs opacity-70">
+          {detectorEnabled 
+            ? "Detector is activated - will capture images automatically when light is detected"
+            : "Detector is deactivated - no automatic captures will occur"}
         </div>
         
         <div className="space-y-4">
