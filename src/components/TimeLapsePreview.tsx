@@ -31,7 +31,9 @@ export const TimeLapsePreview: React.FC<TimeLapsePreviewProps> = ({
       const deltaTime = timestamp - lastFrameTimeRef.current;
 
       if (deltaTime >= frameDelay) {
-        setCurrentFrameIndex((prevIndex) => (prevIndex + 1) % frames.length);
+        // Fix: Calculate the new index first, then pass it to setCurrentFrameIndex
+        const newIndex = (currentFrameIndex + 1) % frames.length;
+        setCurrentFrameIndex(newIndex);
         lastFrameTimeRef.current = timestamp;
       }
 
@@ -52,7 +54,7 @@ export const TimeLapsePreview: React.FC<TimeLapsePreviewProps> = ({
         animationRef.current = null;
       }
     };
-  }, [isPlaying, frameDelay, frames.length, setCurrentFrameIndex]);
+  }, [isPlaying, frameDelay, frames.length, setCurrentFrameIndex, currentFrameIndex]);
 
   if (frames.length === 0) {
     return (

@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import Camera from "@/components/Camera";
 import LightDetector from "@/components/LightDetector";
@@ -6,6 +7,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Clock, Video } from "lucide-react";
 import { DetectionRegion } from "@/utils/imageProcessing";
+import { toast } from "@/hooks/use-toast";
 
 const Index: React.FC = () => {
   // Camera states
