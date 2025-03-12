@@ -31,7 +31,7 @@ export const TimeLapsePreview: React.FC<TimeLapsePreviewProps> = ({
       const deltaTime = timestamp - lastFrameTimeRef.current;
 
       if (deltaTime >= frameDelay) {
-        // Fix: Calculate the new index first, then pass it to setCurrentFrameIndex
+        // Calculate the new index first, then pass it to setCurrentFrameIndex
         const newIndex = (currentFrameIndex + 1) % frames.length;
         setCurrentFrameIndex(newIndex);
         lastFrameTimeRef.current = timestamp;
@@ -61,7 +61,7 @@ export const TimeLapsePreview: React.FC<TimeLapsePreviewProps> = ({
       <div className="flex items-center justify-center aspect-video bg-gray-900">
         <div className="text-center p-6">
           <p className="text-lg font-medium mb-2 text-white">Nenhuma imagem adicionada</p>
-          <p className="text-sm text-gray-300">
+          <p className="text-sm text-gray-200">
             Adicione imagens para começar a criar seu time-lapse
           </p>
         </div>
@@ -78,7 +78,7 @@ export const TimeLapsePreview: React.FC<TimeLapsePreviewProps> = ({
       />
       
       {/* Frame counter overlay */}
-      <div className="absolute bottom-4 right-4 bg-black bg-opacity-70 px-3 py-1 rounded-full text-xs text-white">
+      <div className="absolute bottom-4 right-4 bg-black bg-opacity-80 px-3 py-1 rounded-full text-xs text-white">
         Frame {currentFrameIndex + 1} / {frames.length}
       </div>
     </div>

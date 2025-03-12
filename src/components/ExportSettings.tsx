@@ -37,7 +37,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
       
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="format" className="text-gray-200">Formato de vídeo</Label>
+          <Label htmlFor="format" className="text-white">Formato de vídeo</Label>
           <Select value={format} onValueChange={setFormat}>
             <SelectTrigger id="format" className="bg-gray-700 border-gray-600 text-white">
               <SelectValue placeholder="Selecione o formato" />
@@ -52,8 +52,8 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
       
         <div className="space-y-2">
           <div className="flex justify-between">
-            <Label htmlFor="quality" className="text-gray-200">Qualidade</Label>
-            <span className="text-xs text-gray-300">{quality}%</span>
+            <Label htmlFor="quality" className="text-white">Qualidade</Label>
+            <span className="text-xs text-white">{quality}%</span>
           </div>
           <Slider 
             id="quality" 
@@ -63,14 +63,14 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
             value={[quality]}
             onValueChange={(value) => setQuality(value[0])}
           />
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-xs text-gray-200">
             <span>Menor tamanho</span>
             <span>Melhor qualidade</span>
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="resolution" className="text-gray-200">Resolução</Label>
+          <Label htmlFor="resolution" className="text-white">Resolução</Label>
           <Select value={resolution} onValueChange={setResolution}>
             <SelectTrigger id="resolution" className="bg-gray-700 border-gray-600 text-white">
               <SelectValue placeholder="Selecione a resolução" />
@@ -84,16 +84,16 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
           </Select>
         </div>
         
-        <div className="bg-blue-500 bg-opacity-10 border border-blue-600 rounded-lg p-3">
+        <div className="bg-blue-500 bg-opacity-20 border border-blue-600 rounded-lg p-3">
           <div className="flex items-start">
-            <Info className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
+            <Info className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium mb-2 text-gray-200">Detalhes do time-lapse:</p>
-              <ul className="space-y-1 text-xs text-gray-300">
-                <li><span className="font-medium text-gray-200">Frames:</span> {frameCount}</li>
-                <li><span className="font-medium text-gray-200">FPS:</span> {fps}</li>
-                <li><span className="font-medium text-gray-200">Duração:</span> {minutes}:{seconds.toString().padStart(2, '0')}</li>
-                <li><span className="font-medium text-gray-200">Tamanho estimado:</span> ~{estimatedFileSizeMB} MB</li>
+              <p className="font-medium mb-2 text-white">Detalhes do time-lapse:</p>
+              <ul className="space-y-1 text-xs text-gray-200">
+                <li><span className="font-medium text-white">Frames:</span> {frameCount}</li>
+                <li><span className="font-medium text-white">FPS:</span> {fps}</li>
+                <li><span className="font-medium text-white">Duração:</span> {minutes}:{seconds.toString().padStart(2, '0')}</li>
+                <li><span className="font-medium text-white">Tamanho estimado:</span> ~{estimatedFileSizeMB} MB</li>
               </ul>
             </div>
           </div>
@@ -110,7 +110,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
       </Button>
       
       {frameCount === 0 && (
-        <p className="text-xs text-yellow-500 text-center mt-2">
+        <p className="text-xs text-yellow-300 text-center mt-2">
           Adicione algumas imagens antes de exportar
         </p>
       )}
