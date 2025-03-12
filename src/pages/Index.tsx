@@ -72,7 +72,7 @@ const Index: React.FC = () => {
       </section>
       
       {/* Features Section */}
-      <section className="mt-36 py-16 bg-white dark:bg-gray-800">
+      <section className="mt-10 py-16 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">How It Works</h2>
           
