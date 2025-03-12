@@ -1,11 +1,13 @@
+import React, { useState, useRef, useEffect } from "react";
+import Camera from "@/components/Camera";
+import LightDetector from "@/components/LightDetector";
+import Controls from "@/components/Controls";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Clock, Video } from "lucide-react";
+import { DetectionRegion } from "@/utils/imageProcessing";
 
-import React, { useState, useEffect } from 'react';
-import Camera from '@/components/Camera';
-import Controls from '@/components/Controls';
-import { toast } from '@/components/ui/use-toast';
-import { DetectionRegion } from '../utils/imageProcessing';
-
-const Index = () => {
+const Index: React.FC = () => {
   // Camera states
   const [availableCameras, setAvailableCameras] = useState<MediaDeviceInfo[]>([]);
   const [selectedCamera, setSelectedCamera] = useState<string>('');
@@ -79,7 +81,17 @@ const Index = () => {
   };
   
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-gray-100">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-gray-900 to-black text-white relative overflow-hidden">
+      <div className="fixed top-0 left-0 w-full p-4 flex justify-between items-center z-10">
+        <h1 className="text-2xl font-bold tracking-tight">Detector de LED</h1>
+        <Link to="/time-lapse">
+          <Button variant="outline" className="gap-2">
+            <Video className="h-4 w-4" />
+            <span className="hidden sm:inline">Time-Lapse</span>
+          </Button>
+        </Link>
+      </div>
+      
       <div className="container px-4 py-6 mx-auto flex-1 flex flex-col">
         <header className="text-center mb-6 animate-fade-in">
           <h1 className="text-2xl font-light tracking-tight text-gray-900">Capture Lumens</h1>
