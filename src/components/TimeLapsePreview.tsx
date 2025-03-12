@@ -60,8 +60,8 @@ export const TimeLapsePreview: React.FC<TimeLapsePreviewProps> = ({
     return (
       <div className="flex items-center justify-center aspect-video bg-gray-900">
         <div className="text-center p-6">
-          <p className="text-lg font-medium mb-2">Nenhuma imagem adicionada</p>
-          <p className="text-sm text-gray-400">
+          <p className="text-lg font-medium mb-2 text-white">Nenhuma imagem adicionada</p>
+          <p className="text-sm text-gray-300">
             Adicione imagens para começar a criar seu time-lapse
           </p>
         </div>

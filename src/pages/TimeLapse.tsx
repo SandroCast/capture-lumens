@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -12,6 +11,7 @@ import { FileUploader } from '@/components/FileUploader';
 import { FramesTimeline } from '@/components/FramesTimeline';
 import { TimeLapsePreview } from '@/components/TimeLapsePreview';
 import { ExportSettings } from '@/components/ExportSettings';
+import { exportTimeLapse } from '@/utils/exportUtils';
 
 const TimeLapse: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +20,8 @@ const TimeLapse: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
   const [selectedFrames, setSelectedFrames] = useState<Set<string>>(new Set());
+  const [exportFormat, setExportFormat] = useState('mp4');
+  const [exportQuality, setExportQuality] = useState(80);
 
   // Handle frame upload
   const handleFilesAdded = (files: File[]) => {
@@ -73,19 +75,10 @@ const TimeLapse: React.FC = () => {
   };
 
   // Export time lapse as video
-  const exportTimeLapse = () => {
-    if (frames.length === 0) {
-      toast.error("Não há frames para exportar");
-      return;
-    }
-    
-    toast.success("Começando a exportação do time-lapse...");
-    
-    // Actual export logic would be implemented in a proper util function
-    // For now, we'll just show a success message
-    setTimeout(() => {
-      toast.success("Time-lapse exportado com sucesso!");
-    }, 2000);
+  const handleExport = async (format: string, quality: number) => {
+    setExportFormat(format);
+    setExportQuality(quality);
+    await exportTimeLapse(frames, format, quality, frameDelay);
   };
 
   return (
@@ -124,7 +117,7 @@ const TimeLapse: React.FC = () => {
                 step={1}
                 onValueChange={(value) => setFrameDelay(value[0])}
               />
-              <div className="flex justify-between text-xs mt-1">
+              <div className="flex justify-between text-xs mt-1 text-gray-300">
                 <span>Rápido (30 FPS)</span>
                 <span>Velocidade: {Math.round(1000 / frameDelay)} FPS</span>
                 <span>Lento (1 FPS)</span>
@@ -150,7 +143,7 @@ const TimeLapse: React.FC = () => {
               <FileUploader onFilesAdded={handleFilesAdded} />
               
               <div className="text-center p-4 bg-gray-800 rounded-lg">
-                <p className="text-sm text-gray-400 mb-2">
+                <p className="text-sm text-gray-300 mb-2">
                   {frames.length > 0 
                     ? `${frames.length} frame${frames.length !== 1 ? 's' : ''} carregado${frames.length !== 1 ? 's' : ''}`
                     : 'Nenhum frame carregado ainda'}
@@ -188,7 +181,7 @@ const TimeLapse: React.FC = () => {
               <ExportSettings 
                 frameCount={frames.length}
                 frameDelay={frameDelay}
-                onExport={exportTimeLapse}
+                onExport={(format, quality) => handleExport(format, quality)}
               />
             </TabsContent>
           </Tabs>
