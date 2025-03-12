@@ -1,153 +1,146 @@
 
-import React, { useState, useRef, useEffect } from "react";
-import Camera from "@/components/Camera";
-import LightDetector from "@/components/LightDetector";
-import Controls from "@/components/Controls";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Clock, Video } from "lucide-react";
-import { DetectionRegion } from "@/utils/imageProcessing";
-import { toast } from "@/hooks/use-toast";
+import { Camera, Video, Github, Twitter } from "lucide-react";
 
 const Index: React.FC = () => {
-  // Camera states
-  const [availableCameras, setAvailableCameras] = useState<MediaDeviceInfo[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState<string>('');
-  
-  // Capture settings
-  const [sensitivity, setSensitivity] = useState<number>(80); // High default sensitivity
-  const [useFlashlight, setUseFlashlight] = useState<boolean>(true);
-  
-  // Color detection settings
-  const [targetColor, setTargetColor] = useState<string>('#ff0000'); // Default red
-  const [colorTolerance, setColorTolerance] = useState<number>(30); // Default moderate tolerance
-  
-  // Region detection settings
-  const [detectionRegion, setDetectionRegion] = useState<DetectionRegion>({
-    x: 400, // 40% from left
-    y: 400, // 40% from top
-    width: 200, // 20% width
-    height: 200, // 20% height
-    enabled: false // Disabled by default
-  });
-  
-  // Captured images
-  const [capturedImages, setCapturedImages] = useState<Blob[]>([]);
-  
-  // Processing states
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  
-  // Load available cameras
-  useEffect(() => {
-    const getCameras = async () => {
-      try {
-        // Request initial permission before enumeration
-        await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
-        
-        setAvailableCameras(videoDevices);
-        
-        if (videoDevices.length > 0) {
-          // Try to find a back-facing camera first
-          const backCamera = videoDevices.find(
-            device => device.label.toLowerCase().includes('back') || 
-                      device.label.toLowerCase().includes('traseira') ||
-                      device.label.toLowerCase().includes('rear')
-          );
-          
-          setSelectedCamera(backCamera?.deviceId || videoDevices[0].deviceId);
-        }
-      } catch (error) {
-        console.error('Error accessing cameras:', error);
-        toast({
-          title: 'Camera Error',
-          description: 'Could not access device cameras. Please check permissions.',
-          variant: 'destructive'
-        });
-      }
-    };
-    
-    getCameras();
-  }, []);
-  
-  // Handle image capture
-  const handleImageCaptured = (image: Blob) => {
-    setCapturedImages(prev => [...prev, image]);
-  };
-  
-  // This is just a placeholder function since we no longer use batch downloads
-  const handleDownloadImages = () => {
-    // No longer needed - kept for interface compatibility
-  };
-  
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-gray-900 to-black text-white relative overflow-hidden">
-      <div className="fixed top-0 left-0 w-full p-4 flex justify-between items-center z-10">
-        <h1 className="text-2xl font-bold tracking-tight">Detector de LED</h1>
-        <Link to="/time-lapse">
-          <Button variant="outline" className="gap-2">
-            <Video className="h-4 w-4" />
-            <span className="hidden sm:inline">Time-Lapse</span>
-          </Button>
-        </Link>
-      </div>
-      
-      <div className="container px-4 py-6 mx-auto flex-1 flex flex-col">
-        <header className="text-center mb-6 animate-fade-in">
-          <h1 className="text-2xl font-light tracking-tight text-gray-900">Capture Lumens</h1>
-          <p className="text-sm text-gray-500">Automatic light detection and capture</p>
-        </header>
-        
-        <div className="flex-1 flex flex-col lg:flex-row gap-6 items-center max-w-5xl mx-auto w-full">
-          <div className="w-full lg:w-2/3 rounded-xl overflow-hidden shadow-xl animate-scale-in">
-            {availableCameras.length > 0 && selectedCamera ? (
-              <Camera
-                selectedCameraId={selectedCamera}
-                sensitivity={sensitivity}
-                useFlashlight={useFlashlight}
-                onImageCaptured={handleImageCaptured}
-                targetColor={targetColor}
-                colorTolerance={colorTolerance}
-                detectionRegion={detectionRegion}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
-                <div className="text-center p-6">
-                  <div className="w-12 h-12 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto mb-4" />
-                  <p className="text-gray-500">Initializing camera...</p>
-                </div>
-              </div>
-            )}
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+      {/* Navigation Bar */}
+      <nav className="w-full p-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-sm z-10 fixed">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <Camera className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold">LumenCapture</h1>
           </div>
-          
-          <div className="w-full lg:w-1/3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <Controls
-              sensitivity={sensitivity}
-              setSensitivity={setSensitivity}
-              useFlashlight={useFlashlight}
-              setUseFlashlight={setUseFlashlight}
-              capturedImages={capturedImages}
-              isProcessing={isProcessing}
-              isCapturing={availableCameras.length > 0 && !!selectedCamera}
-              onDownloadImages={handleDownloadImages}
-              selectedCamera={selectedCamera}
-              availableCameras={availableCameras}
-              onSelectCamera={setSelectedCamera}
-              targetColor={targetColor}
-              setTargetColor={setTargetColor}
-              colorTolerance={colorTolerance}
-              setColorTolerance={setColorTolerance}
-              detectionRegion={detectionRegion}
-              setDetectionRegion={setDetectionRegion}
-            />
+          <div className="flex space-x-2">
+            <Link to="/detector">
+              <Button variant="ghost" className="text-gray-700 dark:text-gray-300">
+                LED Detector
+              </Button>
+            </Link>
+            <Link to="/time-lapse">
+              <Button variant="ghost" className="text-gray-700 dark:text-gray-300">
+                Time-Lapse
+              </Button>
+            </Link>
           </div>
         </div>
-      </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-24 flex-1 flex flex-col items-center justify-center px-4 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
+            Capture Light, Create Magic
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">
+            Advanced tools for LED detection and stunning time-lapse creation, all in one place.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all hover:shadow-xl hover:scale-105">
+              <Camera className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">LED Detector</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Automatically detect and capture images when LEDs illuminate in your field of view.
+              </p>
+              <Link to="/detector">
+                <Button className="w-full">
+                  <Camera className="mr-2 h-4 w-4" />
+                  Start Detecting
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all hover:shadow-xl hover:scale-105">
+              <Video className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Time-Lapse Creator</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Transform your image sequences into stunning time-lapse videos with professional controls.
+              </p>
+              <Link to="/time-lapse">
+                <Button className="w-full">
+                  <Video className="mr-2 h-4 w-4" />
+                  Create Time-Lapse
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
       
-      <footer className="text-center p-4 text-sm text-gray-400">
-        <p>Keep the app open to continue detecting lights</p>
+      {/* Features Section */}
+      <section className="py-16 bg-white dark:bg-gray-800">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">How It Works</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Camera className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Detect & Capture</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Set up your camera to automatically detect LED lights and capture images when they turn on.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Organize Images</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Review, sort, and prepare your captured images for the time-lapse creation process.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Video className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Create Time-Lapse</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Convert your image sequence into a smooth time-lapse video with customizable settings.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Footer */}
+      <footer className="py-8 bg-gray-100 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <div className="flex items-center space-x-2">
+                <Camera className="h-5 w-5 text-primary" />
+                <span className="text-lg font-semibold text-gray-900 dark:text-white">LumenCapture</span>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                © {new Date().getFullYear()} LumenCapture. All rights reserved.
+              </p>
+            </div>
+            
+            <div className="flex flex-col items-center md:items-end">
+              <div className="flex space-x-4 mb-2">
+                <a href="#" className="text-gray-500 hover:text-primary">
+                  <Github className="h-5 w-5" />
+                </a>
+                <a href="#" className="text-gray-500 hover:text-primary">
+                  <Twitter className="h-5 w-5" />
+                </a>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Privacy Policy | Terms of Service
+              </p>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );
