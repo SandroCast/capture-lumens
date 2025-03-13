@@ -184,7 +184,7 @@ const Controls: React.FC<ControlsProps> = ({
                 <Slider 
                   id="region-width"
                   value={[detectionRegion.width]} 
-                  min={100} 
+                  min={10} 
                   max={1000} 
                   step={10}
                   onValueChange={(value) => handleRegionChange('width', value[0])}
@@ -199,7 +199,7 @@ const Controls: React.FC<ControlsProps> = ({
                 <Slider 
                   id="region-height"
                   value={[detectionRegion.height]} 
-                  min={100} 
+                  min={10} 
                   max={1000} 
                   step={10}
                   onValueChange={(value) => handleRegionChange('height', value[0])}
@@ -218,8 +218,8 @@ const Controls: React.FC<ControlsProps> = ({
           <Slider 
             value={[sensitivity]} 
             min={0} 
-            max={5} 
-            step={0.1}
+            max={100} 
+            step={10}
             onValueChange={(value) => setSensitivity(value[0])}
             className="mt-2"
           />
