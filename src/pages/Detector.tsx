@@ -18,6 +18,10 @@ const Detector: React.FC = () => {
   const [sensitivity, setSensitivity] = useState<number>(80); // High default sensitivity
   const [useFlashlight, setUseFlashlight] = useState<boolean>(true);
   
+  // Focus settings
+  const [focusMode, setFocusMode] = useState<'auto' | 'manual'>('manual'); // Default to manual focus
+  const [focusDistance, setFocusDistance] = useState<number>(0.5); // Mid-range default
+  
   // Color detection settings
   const [targetColor, setTargetColor] = useState<string>('#ff0000'); // Default red
   const [colorTolerance, setColorTolerance] = useState<number>(30); // Default moderate tolerance
@@ -112,6 +116,8 @@ const Detector: React.FC = () => {
                 colorTolerance={colorTolerance}
                 detectionRegion={detectionRegion}
                 detectorEnabled={detectorEnabled}
+                focusMode={focusMode}
+                focusDistance={focusDistance}
               />
             ) : (
               <div className="w-full h-80 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl">
@@ -144,6 +150,10 @@ const Detector: React.FC = () => {
               setDetectionRegion={setDetectionRegion}
               detectorEnabled={detectorEnabled}
               setDetectorEnabled={setDetectorEnabled}
+              focusMode={focusMode}
+              setFocusMode={setFocusMode}
+              focusDistance={focusDistance}
+              setFocusDistance={setFocusDistance}
             />
           </div>
         </div>

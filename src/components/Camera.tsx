@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import LightDetector from './LightDetector';
@@ -14,6 +13,8 @@ interface CameraProps {
   colorTolerance?: number;
   detectionRegion?: DetectionRegion;
   detectorEnabled: boolean;
+  focusMode: 'auto' | 'manual';
+  focusDistance?: number;
 }
 
 const Camera: React.FC<CameraProps> = ({
@@ -24,7 +25,9 @@ const Camera: React.FC<CameraProps> = ({
   targetColor,
   colorTolerance,
   detectionRegion,
-  detectorEnabled
+  detectorEnabled,
+  focusMode,
+  focusDistance = 0.5
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -43,14 +46,32 @@ const Camera: React.FC<CameraProps> = ({
           streamRef.current.getTracks().forEach(track => track.stop());
         }
         
+        // Set up camera constraints
+        const constraints: MediaTrackConstraints = {
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        };
+        
+        // Add device ID if available
+        if (selectedCameraId) {
+          constraints.deviceId = { exact: selectedCameraId };
+        } else {
+          constraints.facingMode = 'environment';
+        }
+        
+        // Add focus mode constraints
+        // @ts-ignore - focusMode property might not be in types
+        constraints.focusMode = focusMode;
+        
+        // Add manual focus distance if needed
+        if (focusMode === 'manual') {
+          // @ts-ignore - focusDistance property might not be in types
+          constraints.focusDistance = focusDistance;
+        }
+        
         // Request camera access
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            deviceId: selectedCameraId ? { exact: selectedCameraId } : undefined,
-            facingMode: selectedCameraId ? undefined : 'environment',
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-          },
+          video: constraints,
           audio: false
         });
         
@@ -95,7 +116,44 @@ const Camera: React.FC<CameraProps> = ({
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [selectedCameraId]);
+  }, [selectedCameraId, focusMode, focusDistance]);
+  
+  // Apply manual focus when it changes
+  useEffect(() => {
+    const applyFocusSettings = async () => {
+      if (!streamRef.current || focusMode !== 'manual') return;
+      
+      try {
+        const track = streamRef.current.getVideoTracks()[0];
+        if (!track) return;
+        
+        const capabilities = track.getCapabilities();
+        // @ts-ignore - focusMode might not be in types
+        if (!capabilities.focusMode || !capabilities.focusMode.includes('manual')) {
+          toast({
+            title: 'Focus Control Unavailable',
+            description: 'Your device does not support manual focus control.',
+            variant: 'default'
+          });
+          return;
+        }
+        
+        // Set focus settings
+        // @ts-ignore - focusMode might not be in types
+        await track.applyConstraints({ 
+          advanced: [{ 
+            focusMode: 'manual',
+            // @ts-ignore - focusDistance might not be in types
+            focusDistance: focusDistance 
+          }] 
+        });
+      } catch (error) {
+        console.error('Focus control error:', error);
+      }
+    };
+    
+    applyFocusSettings();
+  }, [focusMode, focusDistance]);
   
   // Toggle flashlight
   const toggleFlashlight = async (on: boolean) => {

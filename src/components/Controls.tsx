@@ -25,6 +25,10 @@ interface ControlsProps {
   setDetectionRegion: (region: DetectionRegion) => void;
   detectorEnabled: boolean;
   setDetectorEnabled: (enabled: boolean) => void;
+  focusMode: 'auto' | 'manual';
+  setFocusMode: (mode: 'auto' | 'manual') => void;
+  focusDistance: number;
+  setFocusDistance: (distance: number) => void;
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -44,7 +48,11 @@ const Controls: React.FC<ControlsProps> = ({
   detectionRegion,
   setDetectionRegion,
   detectorEnabled,
-  setDetectorEnabled
+  setDetectorEnabled,
+  focusMode,
+  setFocusMode,
+  focusDistance,
+  setFocusDistance
 }) => {
   const [showRegionSettings, setShowRegionSettings] = useState(false);
   
@@ -76,6 +84,42 @@ const Controls: React.FC<ControlsProps> = ({
               </option>
             ))}
           </select>
+        </div>
+        
+        {/* Focus Controls */}
+        <div className="space-y-2 pt-2 border-t border-white border-opacity-10">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Focus Mode</h3>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs">Auto</span>
+              <Switch 
+                checked={focusMode === 'manual'} 
+                onCheckedChange={(checked) => setFocusMode(checked ? 'manual' : 'auto')}
+              />
+              <span className="text-xs">Manual</span>
+            </div>
+          </div>
+          
+          {focusMode === 'manual' && (
+            <div className="space-y-2 mt-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="focus-distance" className="text-xs">Focus Distance</Label>
+                <span className="text-xs">{Math.round(focusDistance * 100)}%</span>
+              </div>
+              <Slider 
+                id="focus-distance"
+                value={[focusDistance]} 
+                min={0} 
+                max={1} 
+                step={0.01}
+                onValueChange={(value) => setFocusDistance(value[0])}
+              />
+              <div className="flex justify-between text-xs opacity-70">
+                <span>Near</span>
+                <span>Far</span>
+              </div>
+            </div>
+          )}
         </div>
         
         {/* LED Detector Enable/Disable Switch */}
