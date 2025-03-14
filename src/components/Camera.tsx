@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import LightDetector from './LightDetector';
@@ -59,16 +60,6 @@ const Camera: React.FC<CameraProps> = ({
           constraints.facingMode = 'environment';
         }
         
-        // Add focus mode constraints
-        // @ts-ignore - focusMode property might not be in types
-        constraints.focusMode = focusMode;
-        
-        // Add manual focus distance if needed
-        if (focusMode === 'manual') {
-          // @ts-ignore - focusDistance property might not be in types
-          constraints.focusDistance = focusDistance;
-        }
-        
         // Request camera access
         const stream = await navigator.mediaDevices.getUserMedia({
           video: constraints,
@@ -83,6 +74,11 @@ const Camera: React.FC<CameraProps> = ({
         }
         
         setIsActive(true);
+        
+        // Apply focus settings after getting the stream
+        if (focusMode === 'manual' && streamRef.current) {
+          applyFocusSettings();
+        }
       } catch (error) {
         console.error('Error accessing camera:', error);
         toast({
@@ -116,44 +112,51 @@ const Camera: React.FC<CameraProps> = ({
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [selectedCameraId, focusMode, focusDistance]);
+  }, [selectedCameraId]);
   
   // Apply manual focus when it changes
   useEffect(() => {
-    const applyFocusSettings = async () => {
-      if (!streamRef.current || focusMode !== 'manual') return;
-      
-      try {
-        const track = streamRef.current.getVideoTracks()[0];
-        if (!track) return;
-        
-        const capabilities = track.getCapabilities();
-        // @ts-ignore - focusMode might not be in types
-        if (!capabilities.focusMode || !capabilities.focusMode.includes('manual')) {
-          toast({
-            title: 'Focus Control Unavailable',
-            description: 'Your device does not support manual focus control.',
-            variant: 'default'
-          });
-          return;
-        }
-        
-        // Set focus settings
-        // @ts-ignore - focusMode might not be in types
-        await track.applyConstraints({ 
-          advanced: [{ 
-            focusMode: 'manual',
-            // @ts-ignore - focusDistance might not be in types
-            focusDistance: focusDistance 
-          }] 
-        });
-      } catch (error) {
-        console.error('Focus control error:', error);
-      }
-    };
-    
-    applyFocusSettings();
+    if (focusMode === 'manual' && streamRef.current) {
+      applyFocusSettings();
+    }
   }, [focusMode, focusDistance]);
+  
+  // Extracted the focus setting logic to a separate function
+  const applyFocusSettings = async () => {
+    if (!streamRef.current) return;
+    
+    try {
+      const track = streamRef.current.getVideoTracks()[0];
+      if (!track) return;
+      
+      const capabilities = track.getCapabilities();
+      
+      // Check if focus mode is supported by the device
+      // @ts-ignore - focusMode might not be in types
+      if (!capabilities.focusMode || !capabilities.focusMode.includes('manual')) {
+        toast({
+          title: 'Focus Control Unavailable',
+          description: 'Your device does not support manual focus control.',
+          variant: 'default'
+        });
+        return;
+      }
+      
+      // Apply focus constraints using advanced constraints
+      // This uses a type assertion (as any) to bypass TypeScript constraints
+      // while allowing browser-specific focus controls to work
+      await track.applyConstraints({
+        advanced: [{
+          // Using 'as any' to bypass TypeScript checking for non-standard constraints
+          // that may be supported by browsers but not in the TypeScript definition
+          focusMode: 'manual',
+          focusDistance: focusDistance
+        } as any]
+      });
+    } catch (error) {
+      console.error('Focus control error:', error);
+    }
+  };
   
   // Toggle flashlight
   const toggleFlashlight = async (on: boolean) => {
