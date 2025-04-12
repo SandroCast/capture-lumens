@@ -5,12 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Download, Info } from 'lucide-react';
 
 interface ExportSettingsProps {
   frameCount: number;
   frameDelay: number;
-  onExport: (format: string, quality: number) => void;
+  onExport: (format: string, quality: number, preserveQuality: boolean) => void;
 }
 
 export const ExportSettings: React.FC<ExportSettingsProps> = ({
@@ -19,8 +20,9 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
   onExport,
 }) => {
   const [format, setFormat] = useState('mp4');
-  const [quality, setQuality] = useState(80);
+  const [quality, setQuality] = useState(95); // Increased default quality
   const [resolution, setResolution] = useState('original');
+  const [preserveQuality, setPreserveQuality] = useState(true);
   
   // Calculate estimated duration and file size
   const fps = Math.round(1000 / frameDelay);
@@ -29,7 +31,8 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
   const seconds = Math.floor(duration % 60);
   
   // This is a very rough estimate and would need to be refined in a real app
-  const estimatedFileSizeMB = (frameCount * quality * 0.005).toFixed(1);
+  // Increased the size estimate for higher quality
+  const estimatedFileSizeMB = (frameCount * quality * 0.01).toFixed(1);
 
   return (
     <div className="space-y-4 bg-gray-800 rounded-lg p-4">
@@ -44,7 +47,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
             </SelectTrigger>
             <SelectContent className="bg-gray-700 border-gray-600 text-white">
               <SelectItem value="mp4">MP4 (H.264)</SelectItem>
-              <SelectItem value="webm">WebM</SelectItem>
+              <SelectItem value="webm">WebM (VP9)</SelectItem>
               <SelectItem value="gif">GIF</SelectItem>
             </SelectContent>
           </Select>
@@ -57,7 +60,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
           </div>
           <Slider 
             id="quality" 
-            min={10} 
+            min={50} 
             max={100} 
             step={5}
             value={[quality]}
@@ -67,6 +70,20 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
             <span>Menor tamanho</span>
             <span>Melhor qualidade</span>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="preserve-quality" className="text-white">Preservar qualidade original</Label>
+            <Switch 
+              id="preserve-quality" 
+              checked={preserveQuality}
+              onCheckedChange={setPreserveQuality}
+            />
+          </div>
+          <p className="text-xs text-gray-300">
+            Mantém as dimensões originais e evita compressão excessiva
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -103,7 +120,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
       <Button 
         className="w-full mt-6" 
         disabled={frameCount === 0}
-        onClick={() => onExport(format, quality)}
+        onClick={() => onExport(format, quality, preserveQuality)}
       >
         <Download className="mr-2 h-4 w-4" />
         Exportar time-lapse

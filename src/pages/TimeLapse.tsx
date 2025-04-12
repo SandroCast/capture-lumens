@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -21,7 +22,8 @@ const TimeLapse: React.FC = () => {
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
   const [selectedFrames, setSelectedFrames] = useState<Set<string>>(new Set());
   const [exportFormat, setExportFormat] = useState('mp4');
-  const [exportQuality, setExportQuality] = useState(80);
+  const [exportQuality, setExportQuality] = useState(95);
+  const [preserveQuality, setPreserveQuality] = useState(true);
 
   // Handle frame upload
   const handleFilesAdded = (files: File[]) => {
@@ -75,10 +77,11 @@ const TimeLapse: React.FC = () => {
   };
 
   // Export time lapse as video
-  const handleExport = async (format: string, quality: number) => {
+  const handleExport = async (format: string, quality: number, preserveQuality: boolean) => {
     setExportFormat(format);
     setExportQuality(quality);
-    await exportTimeLapse(frames, format, quality, frameDelay);
+    setPreserveQuality(preserveQuality);
+    await exportTimeLapse(frames, format, quality, frameDelay, preserveQuality);
   };
 
   return (
@@ -181,7 +184,7 @@ const TimeLapse: React.FC = () => {
               <ExportSettings 
                 frameCount={frames.length}
                 frameDelay={frameDelay}
-                onExport={(format, quality) => handleExport(format, quality)}
+                onExport={(format, quality, preserveQuality) => handleExport(format, quality, preserveQuality)}
               />
             </TabsContent>
           </Tabs>
