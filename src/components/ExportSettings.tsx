@@ -6,12 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, Info } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
 
 interface ExportSettingsProps {
   frameCount: number;
   frameDelay: number;
-  onExport: (format: string, quality: number, preserveQuality: boolean) => void;
+  onExport: (format: string, quality: number) => void;
 }
 
 export const ExportSettings: React.FC<ExportSettingsProps> = ({
@@ -22,7 +21,6 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
   const [format, setFormat] = useState('mp4');
   const [quality, setQuality] = useState(80);
   const [resolution, setResolution] = useState('original');
-  const [preserveQuality, setPreserveQuality] = useState(true);
   
   // Calculate estimated duration and file size
   const fps = Math.round(1000 / frameDelay);
@@ -31,7 +29,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
   const seconds = Math.floor(duration % 60);
   
   // This is a very rough estimate and would need to be refined in a real app
-  const estimatedFileSizeMB = (frameCount * quality * (preserveQuality ? 0.01 : 0.005)).toFixed(1);
+  const estimatedFileSizeMB = (frameCount * quality * 0.005).toFixed(1);
 
   return (
     <div className="space-y-4 bg-gray-800 rounded-lg p-4">
@@ -86,17 +84,6 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
           </Select>
         </div>
         
-        <div className="flex items-center space-x-2 mt-2">
-          <Switch 
-            id="preserve-quality" 
-            checked={preserveQuality} 
-            onCheckedChange={setPreserveQuality}
-          />
-          <Label htmlFor="preserve-quality" className="text-white">
-            Preservar qualidade original
-          </Label>
-        </div>
-        
         <div className="bg-blue-500 bg-opacity-20 border border-blue-600 rounded-lg p-3">
           <div className="flex items-start">
             <Info className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" />
@@ -116,7 +103,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({
       <Button 
         className="w-full mt-6" 
         disabled={frameCount === 0}
-        onClick={() => onExport(format, quality, preserveQuality)}
+        onClick={() => onExport(format, quality)}
       >
         <Download className="mr-2 h-4 w-4" />
         Exportar time-lapse
