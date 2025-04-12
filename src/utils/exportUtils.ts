@@ -10,7 +10,8 @@ export const createVideoFromFrames = async (
   frames: { id: string; file: File; url: string }[],
   format: string,
   fps: number,
-  quality: number
+  quality: number,
+  preserveQuality: boolean = false
 ): Promise<Blob> => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -46,7 +47,10 @@ export const createVideoFromFrames = async (
         : 'video/webm';
       
       // Configure video bitrate based on quality (higher quality = higher bitrate)
-      const videoBitsPerSecond = 1000000 * (quality / 100);
+      // Increase bitrate for preserveQuality option
+      const videoBitsPerSecond = preserveQuality 
+        ? 8000000 * (quality / 100) // Much higher bitrate for preserved quality
+        : 2000000 * (quality / 100); // Regular bitrate
       
       const stream = canvas.captureStream();
       const recorder = new MediaRecorder(stream, {
@@ -89,8 +93,32 @@ export const createVideoFromFrames = async (
         
         await new Promise<void>((resolve) => {
           img.onload = () => {
+            // Clear the canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Calculate dimensions to maintain aspect ratio
+            let drawWidth = img.width;
+            let drawHeight = img.height;
+            let offsetX = 0;
+            let offsetY = 0;
+            
+            // If image dimensions don't match canvas, center the image and maintain aspect ratio
+            if (img.width !== canvas.width || img.height !== canvas.height) {
+              // Determine if we need to scale by width or height
+              const scaleWidth = canvas.width / img.width;
+              const scaleHeight = canvas.height / img.height;
+              const scale = Math.min(scaleWidth, scaleHeight);
+              
+              drawWidth = img.width * scale;
+              drawHeight = img.height * scale;
+              
+              // Center the image
+              offsetX = (canvas.width - drawWidth) / 2;
+              offsetY = (canvas.height - drawHeight) / 2;
+            }
+            
+            // Draw the image preserving aspect ratio
+            ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
             resolve();
           };
           img.onerror = () => {
@@ -117,7 +145,8 @@ export const createVideoFromFrames = async (
 export const createGifFromFrames = async (
   frames: { id: string; file: File; url: string }[],
   fps: number,
-  quality: number
+  quality: number,
+  preserveQuality: boolean = false
 ): Promise<Blob> => {
   // For simplicity, we'll use the same video method but convert to GIF format
   // In a real application, you would use a dedicated GIF library
@@ -141,7 +170,8 @@ export const exportTimeLapse = async (
   frames: { id: string; file: File; url: string }[],
   format: string,
   quality: number,
-  frameDelay: number
+  frameDelay: number,
+  preserveQuality: boolean = false
 ): Promise<void> => {
   if (frames.length === 0) {
     toast.error("Não há frames para exportar");
@@ -159,19 +189,19 @@ export const exportTimeLapse = async (
     // Export different formats
     switch (format) {
       case 'gif':
-        blob = await createGifFromFrames(frames, fps, quality);
+        blob = await createGifFromFrames(frames, fps, quality, preserveQuality);
         filename = `timelapse_${new Date().toISOString().replace(/:/g, '-')}.gif`;
         break;
       case 'mp4':
-        blob = await createVideoFromFrames(frames, 'mp4', fps, quality);
+        blob = await createVideoFromFrames(frames, 'mp4', fps, quality, preserveQuality);
         filename = `timelapse_${new Date().toISOString().replace(/:/g, '-')}.mp4`;
         break;
       case 'webm':
-        blob = await createVideoFromFrames(frames, 'webm', fps, quality);
+        blob = await createVideoFromFrames(frames, 'webm', fps, quality, preserveQuality);
         filename = `timelapse_${new Date().toISOString().replace(/:/g, '-')}.webm`;
         break;
       default:
-        blob = await createVideoFromFrames(frames, 'mp4', fps, quality);
+        blob = await createVideoFromFrames(frames, 'mp4', fps, quality, preserveQuality);
         filename = `timelapse_${new Date().toISOString().replace(/:/g, '-')}.mp4`;
     }
     
